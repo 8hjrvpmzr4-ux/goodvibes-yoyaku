@@ -246,15 +246,15 @@ function renderConfirm() {
     <p><span>電話番号</span>${esc(S.tel)}</p>
     ${S.note ? `<p><span>ご要望</span>${esc(S.note)}</p>` : ''}
   </div><p class="err" id="cErr"></p>
-  <p class="note">ご予約の変更・キャンセルは、LINEのトークまたはお電話でご連絡ください。</p>`;
-  return { html: h, foot: backBtn + '<button class="pri" id="sendBtn" onclick="submit()">予約を確定する</button>' };
+  <p class="note">こちらは予約リクエストです。店舗で空き状況を確認したあと、LINEで予約確定のご連絡をお送りします。</p>`;
+  return { html: h, foot: backBtn + '<button class="pri" id="sendBtn" onclick="submit()">この内容でリクエストする</button>' };
 }
 
 function renderDone() {
   return {
-    html: `<div class="done"><div class="ck">✓</div><h2>ご予約が完了しました</h2>
+    html: `<div class="done"><div class="ck">✓</div><h2>予約リクエストを受け付けました</h2>
       <p>${esc(S.store)}<br>${jpDate(S.date)} ${S.start}〜${S.end}</p>
-      <p class="note">ご来店を心よりお待ちしております。<br>変更・キャンセルはLINEのトークでご連絡ください。</p></div>`,
+      <p class="note">まだ予約は確定していません。<br>店舗から確定のご連絡をLINEでお送りしますので、少々お待ちください。</p></div>`,
     foot: (window.liff && liff.isInClient && liff.isInClient()) ? '<button class="pri" onclick="liff.closeWindow()">閉じる</button>' : ''
   };
 }
@@ -293,7 +293,7 @@ async function submit() {
     go(6);
   } catch (e) {
     $('#cErr').textContent = '送信できませんでした：' + (e.message || e);
-    btn.disabled = false; btn.textContent = '予約を確定する';
+    btn.disabled = false; btn.textContent = 'この内容でリクエストする';
   }
 }
 async function sendLineMessage() {
@@ -302,7 +302,7 @@ async function sendLineMessage() {
   const lines = ['店舗：' + S.store, '日時：' + jpDate(S.date) + ' ' + S.start + '〜' + S.end, 'メニュー：' + S.menu.name];
   if (add) lines.push('追加：' + add);
   lines.push('お名前：' + S.name + ' 様');
-  const text = '【LINE予約】予約しました\n\n' + lines.join('\n');
+  const text = '【LINE予約リクエスト】\n以下の内容で予約をリクエストしました。\n\n' + lines.join('\n');
   try { await liff.sendMessages([{ type: 'text', text }]); } catch (e) {}
 }
 
