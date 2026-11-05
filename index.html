@@ -125,10 +125,23 @@ async function boot() {
     const r = await api({ action: 'init' });
     if (!r.ok) throw new Error(r.error);
     DATA = r;
+    const pre = presetStore();
+    if (pre && DATA.stores.includes(pre)) { S.store = pre; S.step = 1; }
     render();
   } catch (e) {
     $('#main').innerHTML = `<div class="load">読み込みに失敗しました。<br>時間をおいて再度お試しください。<br><small>${esc(e.message || e)}</small></div>`;
   }
+}
+
+// URLの ?store=長崎店 で店舗を最初から選択（LIFF経由の liff.state にも対応）
+function presetStore() {
+  try {
+    const p = new URLSearchParams(location.search);
+    if (p.get('store')) return p.get('store');
+    const st = p.get('liff.state');
+    if (st) return new URLSearchParams(st.split('?')[1] || '').get('store');
+  } catch (e) {}
+  return '';
 }
 
 /* ----- 画面描画 ----- */
